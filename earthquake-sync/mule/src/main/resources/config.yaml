@@ -1,0 +1,6 @@
+http:
+  port: "8081"
+p2pquake:
+  host: "api.p2pquake.net"
+api:
+  key: "CHANGE_ME"   # 本番は Secure Properties / Runtime Manager のプロパティで上書き

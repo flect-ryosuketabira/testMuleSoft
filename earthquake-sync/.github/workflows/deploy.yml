@@ -1,0 +1,47 @@
+name: Deploy to Anypoint
+
+on:
+  push:
+    branches: [main]
+    paths: ['mule/**', '.github/workflows/deploy.yml']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # Exchange(anypoint-exchange-v3)からの依存取得用にConnected Appで認証
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>~~~Client~~~</username>
+                <password>${{ secrets.ANYPOINT_CLIENT_ID }}~?~${{ secrets.ANYPOINT_CLIENT_SECRET }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Deploy to CloudHub 2.0
+        working-directory: mule
+        run: >
+          mvn -B clean deploy -DmuleDeploy
+          -Danypoint.client.id='${{ secrets.ANYPOINT_CLIENT_ID }}'
+          -Danypoint.client.secret='${{ secrets.ANYPOINT_CLIENT_SECRET }}'
+          -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
+          -Danypoint.target='${{ vars.ANYPOINT_TARGET }}'
+          -Danypoint.app.name='${{ vars.ANYPOINT_APP_NAME }}'
+          -Danypoint.public.url='${{ vars.ANYPOINT_PUBLIC_URL }}'
+          -Dapi.key='${{ secrets.API_KEY }}'

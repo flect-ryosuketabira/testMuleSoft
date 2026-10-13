@@ -1,0 +1,53 @@
+#%RAML 1.0
+title: Earthquake API
+version: v1
+baseUri: https://{host}/api
+mediaType: application/json
+
+types:
+  Point:
+    properties:
+      pref: string
+      addr: string
+      isArea: boolean
+      scale: integer
+  Earthquake:
+    properties:
+      id: string
+      occurredAt: datetime
+      issuedAt: datetime
+      hypocenterName: string
+      latitude: number | nil
+      longitude: number | nil
+      depthKm: number | nil
+      magnitude: number | nil
+      maxScale: integer | nil
+      maxScaleLabel: string | nil
+      domesticTsunami: string
+      foreignTsunami: string
+      issueType: string
+      issueSource: string
+      correct: string
+      comment: string
+      points: Point[]
+
+/earthquakes:
+  get:
+    description: P2P地震情報(code=551)の直近履歴
+    headers:
+      x-api-key: string
+    queryParameters:
+      limit:
+        type: integer
+        default: 100
+        maximum: 100
+      offset:
+        type: integer
+        default: 0
+    responses:
+      200:
+        body:
+          application/json:
+            type: Earthquake[]
+      401:
+      502:
