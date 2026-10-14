@@ -17,15 +17,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # mule-maven-plugin は Maven 3.9.x 前提。runner 標準の Maven (4系の可能性) だと
-      # NoSuchMethodError (maven-resolver 不整合) になるため 3.9.9 を固定で使用
       - name: Install Maven 3.9.9
         run: |
           curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C "$HOME"
           echo "$HOME/apache-maven-3.9.9/bin" >> "$GITHUB_PATH"
           "$HOME/apache-maven-3.9.9/bin/mvn" -v
 
-      # Exchange(anypoint-exchange-v3)からの依存取得用にConnected Appで認証
       - name: Configure Maven settings
         run: |
           mkdir -p ~/.m2
@@ -41,10 +38,30 @@ jobs:
           </settings>
           EOF
 
+      - name: Build package
+        working-directory: earthquake-sync/mule
+        run: mvn -B clean package -DskipTests
+
+      - name: Inspect JAR contents
+        working-directory: earthquake-sync/mule
+        run: |
+          JAR=$(ls target/*-mule-application.jar)
+          echo "JAR: $JAR ($(du -h "$JAR" | cut -f1))"
+          echo "=== META-INF entries ==="
+          unzip -l "$JAR" | grep -E "META-INF" | head -40
+          echo "=== top-level entries ==="
+          unzip -l "$JAR" | awk '{print $4}' | grep -vE "^$|^Name|^----" | cut -d/ -f1 | sort -u
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mule-application-jar
+          path: earthquake-sync/mule/target/*-mule-application.jar
+
       - name: Deploy to CloudHub 2.0
         working-directory: earthquake-sync/mule
         run: >
-          mvn -B -X clean deploy -DmuleDeploy
+          mvn -B -X deploy -DmuleDeploy -DskipTests
           -Danypoint.username='${{ secrets.ANYPOINT_USERNAME }}'
           -Danypoint.password='${{ secrets.ANYPOINT_PASSWORD }}'
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
@@ -53,7 +70,6 @@ jobs:
           -Dapi.key='${{ secrets.API_KEY }}'
           > "$GITHUB_WORKSPACE/mvn-debug.log" 2>&1
 
-      # 失敗時のみ、原因らしき行を抽出して表示 (Secretsは自動マスクされる)
       - name: Show deploy failure details
         if: failure()
         run: |

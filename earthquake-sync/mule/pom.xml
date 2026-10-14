@@ -32,7 +32,7 @@
                         <username>${anypoint.username}</username>
                         <password>${anypoint.password}</password>
                         <applicationName>${anypoint.app.name}</applicationName>
-                        <deploymentTimeout>1800000</deploymentTimeout>
+                        <deploymentTimeout>600000</deploymentTimeout>
                         <replicas>1</replicas>
                         <vCores>0.1</vCores>
                         <properties>
