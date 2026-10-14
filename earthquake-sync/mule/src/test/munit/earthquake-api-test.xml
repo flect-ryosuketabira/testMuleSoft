@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="earthquake-api-test.xml"/>
+
+    <!-- ========== 正常系: P2PQuakeのレスポンスを正規化して返す ========== -->
+    <munit:test name="normalizes-upstream-response"
+                description="P2PQuake(551)のレスポンスが、日時(ISO8601+09:00)・震度ラベル・null変換つきで正規化される">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref" whereValue="P2PQuake_Request_config"/>
+                    <munit-tools:with-attribute attributeName="path" whereValue="/v2/history"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[output application/json --- readUrl('classpath://p2pquake-sample.json', 'application/json')]"
+                                         mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {limit: '2'}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get-earthquakes-flow"/>
+        </munit:execution>
+        <munit:validation>
+            <!-- 件数 -->
+            <munit-tools:assert-that expression="#[sizeOf(payload) as String]"
+                                     is="#[MunitTools::equalTo('2')]"/>
+
+            <!-- 1件目: 通常値 -->
+            <munit-tools:assert-that expression="#[payload[0].id]"
+                                     is="#[MunitTools::equalTo('eq-normal-001')]"/>
+            <munit-tools:assert-that expression="#[payload[0].occurredAt as String]"
+                                     is="#[MunitTools::equalTo('2026-10-13T11:27:00+09:00')]"/>
+            <munit-tools:assert-that expression="#[payload[0].issuedAt as String]"
+                                     is="#[MunitTools::equalTo('2026-10-13T11:31:53+09:00')]"/>
+            <munit-tools:assert-that expression="#[payload[0].hypocenterName]"
+                                     is="#[MunitTools::equalTo('熊本県天草・芦北地方')]"/>
+            <munit-tools:assert-that expression="#[payload[0].magnitude as String]"
+                                     is="#[MunitTools::equalTo('3.5')]"/>
+            <munit-tools:assert-that expression="#[payload[0].depthKm as String]"
+                                     is="#[MunitTools::equalTo('0')]"/>
+            <munit-tools:assert-that expression="#[payload[0].maxScale as String]"
+                                     is="#[MunitTools::equalTo('20')]"/>
+            <munit-tools:assert-that expression="#[payload[0].maxScaleLabel]"
+                                     is="#[MunitTools::equalTo('2')]"/>
+            <munit-tools:assert-that expression="#[payload[0].issueType]"
+                                     is="#[MunitTools::equalTo('DetailScale')]"/>
+            <munit-tools:assert-that expression="#[sizeOf(payload[0].points) as String]"
+                                     is="#[MunitTools::equalTo('2')]"/>
+            <munit-tools:assert-that expression="#[payload[0].points[0].addr]"
+                                     is="#[MunitTools::equalTo('八代市平山新町')]"/>
+
+            <!-- 2件目: 不明値(-1)は null、未定義の震度コードはラベルnull -->
+            <munit-tools:assert-that expression="#[payload[1].id]"
+                                     is="#[MunitTools::equalTo('eq-unknown-002')]"/>
+            <munit-tools:assert-that expression="#[payload[1].magnitude]"
+                                     is="#[MunitTools::nullValue()]"/>
+            <munit-tools:assert-that expression="#[payload[1].depthKm]"
+                                     is="#[MunitTools::nullValue()]"/>
+            <munit-tools:assert-that expression="#[payload[1].latitude]"
+                                     is="#[MunitTools::nullValue()]"/>
+            <munit-tools:assert-that expression="#[payload[1].maxScale]"
+                                     is="#[MunitTools::nullValue()]"/>
+            <munit-tools:assert-that expression="#[payload[1].maxScaleLabel]"
+                                     is="#[MunitTools::nullValue()]"/>
+            <!-- 震度コード45/50 のラベル -->
+            <munit-tools:assert-that expression="#[payload[1].points[0].scale as String]"
+                                     is="#[MunitTools::equalTo('45')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ========== limitパラメータ ========== -->
+    <munit:test name="limit-defaults-to-100"
+                description="limit未指定の場合は 100 になる">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[output application/json --- readUrl('classpath://p2pquake-sample.json', 'application/json')]"
+                                         mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get-earthquakes-flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.limit as String]"
+                                     is="#[MunitTools::equalTo('100')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="limit-is-capped-at-100"
+                description="limit に 100 超を指定しても 100 に丸められる">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[output application/json --- readUrl('classpath://p2pquake-sample.json', 'application/json')]"
+                                         mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {limit: '500'}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get-earthquakes-flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.limit as String]"
+                                     is="#[MunitTools::equalTo('100')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="limit-is-passed-through"
+                description="100以下の limit はそのまま使われる">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[output application/json --- readUrl('classpath://p2pquake-sample.json', 'application/json')]"
+                                         mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {limit: '5'}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get-earthquakes-flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.limit as String]"
+                                     is="#[MunitTools::equalTo('5')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ========== 上流障害: 502 に変換される ========== -->
+    <munit:test name="upstream-connectivity-error-returns-502"
+                description="P2PQuake への接続エラー時、httpStatus=502 と上流エラーのメッセージが設定される">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:then-return>
+                    <munit-tools:error typeId="HTTP:CONNECTIVITY"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <try>
+                <flow-ref name="get-earthquakes-flow"/>
+                <error-handler>
+                    <on-error-continue type="ANY">
+                        <set-variable variableName="errorHandled" value="#[true]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.errorHandled default false]"
+                                     is="#[MunitTools::equalTo(true)]"/>
+            <munit-tools:assert-that expression="#[vars.httpStatus as String]"
+                                     is="#[MunitTools::equalTo('502')]"/>
+            <munit-tools:assert-that expression="#[payload.message]"
+                                     is="#[MunitTools::equalTo('Upstream P2PQuake error')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="upstream-500-error-returns-502"
+                description="P2PQuake が 500 を返した場合も 502 に変換される">
+        <munit:behavior>
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:then-return>
+                    <munit-tools:error typeId="HTTP:INTERNAL_SERVER_ERROR"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit:set-event>
+                <munit:attributes value="#[{headers: {'x-api-key': p('api.key')}, queryParams: {}}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <try>
+                <flow-ref name="get-earthquakes-flow"/>
+                <error-handler>
+                    <on-error-continue type="ANY">
+                        <set-variable variableName="errorHandled" value="#[true]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.errorHandled default false]"
+                                     is="#[MunitTools::equalTo(true)]"/>
+            <munit-tools:assert-that expression="#[vars.httpStatus as String]"
+                                     is="#[MunitTools::equalTo('502')]"/>
+        </munit:validation>
+    </munit:test>
+</mule>
