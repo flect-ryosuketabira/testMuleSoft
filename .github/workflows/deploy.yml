@@ -44,10 +44,20 @@ jobs:
       - name: Deploy to CloudHub 2.0
         working-directory: earthquake-sync/mule
         run: >
-          mvn -B -e clean deploy -DmuleDeploy
+          mvn -B -X clean deploy -DmuleDeploy
           -Danypoint.client.id='${{ secrets.ANYPOINT_CLIENT_ID }}'
           -Danypoint.client.secret='${{ secrets.ANYPOINT_CLIENT_SECRET }}'
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
           -Danypoint.target='${{ vars.ANYPOINT_TARGET }}'
           -Danypoint.app.name='${{ vars.ANYPOINT_APP_NAME }}'
           -Dapi.key='${{ secrets.API_KEY }}'
+          > "$GITHUB_WORKSPACE/mvn-debug.log" 2>&1
+
+      # 失敗時のみ、原因らしき行を抽出して表示 (Secretsは自動マスクされる)
+      - name: Show deploy failure details
+        if: failure()
+        run: |
+          echo "=== deployer related lines ==="
+          grep -iE "mule-deployer|cloudhub|anypoint\.mulesoft|status|forbidden|unauthorized|not found|conflict|invalid|bad request|HTTP/1|\b(400|401|403|404|409|422)\b|message|reason|ERROR\]|Exception" "$GITHUB_WORKSPACE/mvn-debug.log" | grep -viE "maven-resolver|Downloading|Downloaded|\[DEBUG\] +(Imported|Populating|Created|Configuring|\(f\)|\(s\)|org\.apache)" | tail -150
+          echo "=== tail ==="
+          tail -60 "$GITHUB_WORKSPACE/mvn-debug.log"
