@@ -2,7 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.example</groupId>
+    <!-- Exchange資産のgroupIdはBusiness Group(組織)IDにする必要がある -->
+    <groupId>7f3a654e-b451-4b2c-9bf7-83ecb4fd3270</groupId>
     <artifactId>earthquake-api</artifactId>
     <version>1.0.0</version>
     <packaging>mule-application</packaging>
