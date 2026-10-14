@@ -45,8 +45,8 @@ jobs:
         working-directory: earthquake-sync/mule
         run: >
           mvn -B -X clean deploy -DmuleDeploy
-          -Danypoint.client.id='${{ secrets.ANYPOINT_CLIENT_ID }}'
-          -Danypoint.client.secret='${{ secrets.ANYPOINT_CLIENT_SECRET }}'
+          -Danypoint.username='${{ secrets.ANYPOINT_USERNAME }}'
+          -Danypoint.password='${{ secrets.ANYPOINT_PASSWORD }}'
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
           -Danypoint.target='${{ vars.ANYPOINT_TARGET }}'
           -Danypoint.app.name='${{ vars.ANYPOINT_APP_NAME }}'

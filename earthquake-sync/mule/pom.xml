@@ -28,9 +28,8 @@
                         <environment>${anypoint.env}</environment>
                         <target>${anypoint.target}</target>
                         <muleVersion>${app.runtime}</muleVersion>
-                        <connectedAppClientId>${anypoint.client.id}</connectedAppClientId>
-                        <connectedAppClientSecret>${anypoint.client.secret}</connectedAppClientSecret>
-                        <connectedAppGrantType>client_credentials</connectedAppGrantType>
+                        <username>${anypoint.username}</username>
+                        <password>${anypoint.password}</password>
                         <applicationName>${anypoint.app.name}</applicationName>
                         <replicas>1</replicas>
                         <vCores>0.1</vCores>
