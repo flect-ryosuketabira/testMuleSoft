@@ -77,7 +77,7 @@ jobs:
       - name: Deploy to CloudHub 2.0
         working-directory: earthquake-sync/mule
         run: >
-          mvn -B -X deploy -DmuleDeploy -DskipTests
+          mvn -B deploy -DmuleDeploy -DskipTests
           -Danypoint.username='${{ secrets.ANYPOINT_USERNAME }}'
           -Danypoint.password='${{ secrets.ANYPOINT_PASSWORD }}'
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
