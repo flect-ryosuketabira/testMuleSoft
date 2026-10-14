@@ -34,13 +34,6 @@
                         <applicationName>${anypoint.app.name}</applicationName>
                         <replicas>1</replicas>
                         <vCores>0.1</vCores>
-                        <deploymentSettings>
-                            <http>
-                                <inbound>
-                                    <publicUrl>${anypoint.public.url}</publicUrl>
-                                </inbound>
-                            </http>
-                        </deploymentSettings>
                         <properties>
                             <api.key>${api.key}</api.key>
                             <http.port>8081</http.port>

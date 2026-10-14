@@ -43,5 +43,4 @@ jobs:
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
           -Danypoint.target='${{ vars.ANYPOINT_TARGET }}'
           -Danypoint.app.name='${{ vars.ANYPOINT_APP_NAME }}'
-          -Danypoint.public.url='${{ vars.ANYPOINT_PUBLIC_URL }}'
           -Dapi.key='${{ secrets.API_KEY }}'

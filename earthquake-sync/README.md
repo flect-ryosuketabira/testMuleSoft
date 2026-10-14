@@ -60,7 +60,8 @@ GitHub Settings → Secrets and variables → Actions に登録:
 | Variable | ANYPOINT_ENV | 例 Sandbox |
 | Variable | ANYPOINT_TARGET | CloudHub 2.0 の Shared/Private Space 名 |
 | Variable | ANYPOINT_APP_NAME | アプリ名 (一意) |
-| Variable | ANYPOINT_PUBLIC_URL | 公開URL (Spaceのドメイン仕様に合わせる) |
+
+Shared Space前提のため publicUrl は未設定(URLは自動採番)。Private Spaceで独自ドメインを使う場合は pom.xml の deploymentSettings/http/inbound/publicUrl と deploy.yml の `-Danypoint.public.url` を追加する。
 
 ## 未検証・要確認事項
 
