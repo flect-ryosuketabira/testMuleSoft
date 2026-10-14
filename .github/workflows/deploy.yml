@@ -10,13 +10,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-          cache: maven
+
+      # mule-maven-plugin は Maven 3.9.x 前提。runner 標準の Maven (4系の可能性) だと
+      # NoSuchMethodError (maven-resolver 不整合) になるため 3.9.9 を固定で使用
+      - name: Install Maven 3.9.9
+        run: |
+          curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C "$HOME"
+          echo "$HOME/apache-maven-3.9.9/bin" >> "$GITHUB_PATH"
+          "$HOME/apache-maven-3.9.9/bin/mvn" -v
 
       # Exchange(anypoint-exchange-v3)からの依存取得用にConnected Appで認証
       - name: Configure Maven settings
