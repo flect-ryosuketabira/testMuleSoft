@@ -34,12 +34,17 @@ jobs:
             <servers>
               <server>
                 <id>anypoint-exchange-v3</id>
-                <username>~~~Client~~~</username>
-                <password>${{ secrets.ANYPOINT_CLIENT_ID }}~?~${{ secrets.ANYPOINT_CLIENT_SECRET }}</password>
+                <username>${{ secrets.ANYPOINT_USERNAME }}</username>
+                <password>${{ secrets.ANYPOINT_PASSWORD }}</password>
               </server>
             </servers>
           </settings>
           EOF
+
+      # Exchangeの資産はバージョン上書き不可のため、実行ごとにバージョンを採番
+      - name: Set version
+        working-directory: earthquake-sync/mule
+        run: mvn -B versions:set -DnewVersion=1.0.${{ github.run_number }} -DgenerateBackupPoms=false
 
       # 1) ビルドのみ (デプロイ前にJARの中身を確認する)
       - name: Build package
@@ -62,7 +67,13 @@ jobs:
           name: mule-application-jar
           path: earthquake-sync/mule/target/*-mule-application.jar
 
-      # 2) デプロイ (ログはファイルへ。失敗時のみ原因行を抽出して表示)
+      # 2) Exchangeへ公開 (-DmuleDeploy なしの mvn deploy = リポジトリへの公開)
+      #    CloudHub 2.0 はExchange上の資産を参照してデプロイするため必須
+      - name: Publish to Exchange
+        working-directory: earthquake-sync/mule
+        run: mvn -B deploy -DskipTests
+
+      # 3) CloudHub 2.0へデプロイ (ログはファイルへ。失敗時のみ原因行を抽出して表示)
       - name: Deploy to CloudHub 2.0
         working-directory: earthquake-sync/mule
         run: >

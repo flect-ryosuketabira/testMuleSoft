@@ -5,7 +5,7 @@
     <!-- Exchange資産のgroupIdはBusiness Group(組織)IDにする必要がある -->
     <groupId>7f3a654e-b451-4b2c-9bf7-83ecb4fd3270</groupId>
     <artifactId>earthquake-api</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.0</version>
     <packaging>mule-application</packaging>
     <name>earthquake-api</name>
 
@@ -53,6 +53,16 @@
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
+
+    <!-- Exchangeへの公開先 (mvn deploy)。URL中のIDは組織(Business Group) ID -->
+    <distributionManagement>
+        <repository>
+            <id>anypoint-exchange-v3</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/7f3a654e-b451-4b2c-9bf7-83ecb4fd3270/maven</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
