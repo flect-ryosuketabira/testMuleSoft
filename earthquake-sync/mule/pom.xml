@@ -5,7 +5,7 @@
     <!-- Exchange資産のgroupIdはBusiness Group(組織)IDにする必要がある -->
     <groupId>7f3a654e-b451-4b2c-9bf7-83ecb4fd3270</groupId>
     <artifactId>earthquake-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>mule-application</packaging>
     <name>earthquake-api</name>
 
