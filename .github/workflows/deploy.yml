@@ -44,7 +44,7 @@ jobs:
       - name: Deploy to CloudHub 2.0
         working-directory: earthquake-sync/mule
         run: >
-          mvn -B clean deploy -DmuleDeploy
+          mvn -B -e clean deploy -DmuleDeploy
           -Danypoint.client.id='${{ secrets.ANYPOINT_CLIENT_ID }}'
           -Danypoint.client.secret='${{ secrets.ANYPOINT_CLIENT_SECRET }}'
           -Danypoint.env='${{ vars.ANYPOINT_ENV }}'
