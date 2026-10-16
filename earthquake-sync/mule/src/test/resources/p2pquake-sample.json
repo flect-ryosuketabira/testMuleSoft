@@ -1,0 +1,59 @@
+[
+  {
+    "code": 551,
+    "comments": { "freeFormComment": "" },
+    "earthquake": {
+      "domesticTsunami": "None",
+      "foreignTsunami": "Unknown",
+      "hypocenter": {
+        "depth": 0,
+        "latitude": 32.3,
+        "longitude": 130.5,
+        "magnitude": 3.5,
+        "name": "熊本県天草・芦北地方"
+      },
+      "maxScale": 20,
+      "time": "2026/10/13 11:27:00"
+    },
+    "id": "eq-normal-001",
+    "issue": {
+      "correct": "None",
+      "source": "気象庁",
+      "time": "2026/10/13 11:31:53",
+      "type": "DetailScale"
+    },
+    "points": [
+      { "addr": "八代市平山新町", "isArea": false, "pref": "熊本県", "scale": 20 },
+      { "addr": "熊本美里町永富", "isArea": false, "pref": "熊本県", "scale": 10 }
+    ],
+    "time": "2026/10/13 11:31:54.823"
+  },
+  {
+    "code": 551,
+    "comments": { "freeFormComment": "" },
+    "earthquake": {
+      "domesticTsunami": "Unknown",
+      "foreignTsunami": "Unknown",
+      "hypocenter": {
+        "depth": -1,
+        "latitude": -200,
+        "longitude": -200,
+        "magnitude": -1,
+        "name": ""
+      },
+      "maxScale": -1,
+      "time": "2026/10/14 08:00:00"
+    },
+    "id": "eq-unknown-002",
+    "issue": {
+      "correct": "None",
+      "source": "気象庁",
+      "time": "2026/10/14 08:03:00",
+      "type": "ScalePrompt"
+    },
+    "points": [
+      { "addr": "テスト市", "isArea": true, "pref": "東京都", "scale": 45 }
+    ],
+    "time": "2026/10/14 08:03:01.000"
+  }
+]
