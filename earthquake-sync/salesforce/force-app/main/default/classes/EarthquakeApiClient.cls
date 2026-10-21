@@ -1,6 +1,6 @@
 /**
  * MuleSoft経由で地震情報を取得するクライアント。
- * Named Credential: Mule_Earthquake_API (URL=MuleのベースURL, x-api-keyヘッダ付与)
+ * Named Credential: MuleEarthquakeAPI(URL=MuleのベースURL, x-api-keyヘッダ付与)
  */
 public with sharing class EarthquakeApiClient {
 
@@ -21,14 +21,22 @@ public with sharing class EarthquakeApiClient {
         public String issueSource;
         public String correct;
         public String comment;
-        public List<Map<String, Object>> points;
+        public List<PointDto> points;
+    }
+
+    // JSON.deserialize は Object 型を扱えないため、型付きクラスで受ける
+    public class PointDto {
+        public String pref;
+        public String addr;
+        public Boolean isArea;
+        public Integer scale;
     }
 
     public class ApiException extends Exception {}
 
     public static List<EarthquakeDto> fetch(Integer maxCount) {
         HttpRequest req = new HttpRequest();
-        req.setEndpoint('callout:Mule_Earthquake_API/earthquakes?limit=' + maxCount);
+        req.setEndpoint('callout:MuleEarthquakeAPI/earthquakes?limit=' + maxCount);
         req.setMethod('GET');
         req.setHeader('Accept', 'application/json');
         req.setTimeout(60000);
