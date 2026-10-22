@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<!-- Exchange資産のgroupIdはBusiness Group(組織)IDにする必要がある -->
-	<groupId>1b04a0fd-49a0-4df3-b618-9173eb537513</groupId>
+	<groupId>78063834-9762-430c-ac8a-b90ae05ca722</groupId>
 	<artifactId>earthquake-api</artifactId>
 	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
@@ -102,7 +102,7 @@
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>Anypoint Exchange</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/1b04a0fd-49a0-4df3-b618-9173eb537513/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/78063834-9762-430c-ac8a-b90ae05ca722/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
