@@ -20,7 +20,7 @@
         <http:request-connection protocol="HTTPS" host="${weather.host}" port="443"/>
     </http:request-config>
 
-    <!-- GET /weather : お天気API(東京=130010固定)の天気JSONをそのまま返却 -->
+    <!-- GET /weather?city=270000 : お天気APIの天気JSONをそのまま返却 (city省略時は東京=130010) -->
     <flow name="get-weather-flow">
         <http:listener config-ref="HTTP_Listener_config" path="/weather" allowedMethods="GET">
             <http:response statusCode="200"/>
@@ -37,7 +37,7 @@
 
         <http:request method="GET" config-ref="Weather_Request_config" path="/api/forecast">
             <http:query-params><![CDATA[#[{
-                city: "130010"
+                city: attributes.queryParams.city default "130010"
             }]]]></http:query-params>
             <http:response-validator>
                 <http:success-status-code-validator values="200"/>
