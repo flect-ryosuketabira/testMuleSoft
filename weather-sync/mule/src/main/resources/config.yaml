@@ -1,0 +1,6 @@
+http:
+  port: "8081"
+weather:
+  host: "weather.tsukumijima.net"
+api:
+  key: "CHANGE_ME"   # デプロイ時に GitHub Secret API_KEY で上書きされる
