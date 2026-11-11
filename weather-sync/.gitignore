@@ -1,0 +1,7 @@
+target/
+.mule/
+.studio/
+.vscode/
+*.jar
+.DS_Store
+mule/src/main/resources/config-local.yaml
